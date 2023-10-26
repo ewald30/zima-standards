@@ -222,7 +222,7 @@ If quality gates are implemented, a PR should pass all quality gates and build w
 
 #### Unit Testing
 
-Write unit tests at least (update here)
+Write unit tests at least (updateee here)
 
 #### Integration Testing
 
