@@ -19,10 +19,10 @@ Repository that holds standardized information about contributing in the Zima pr
       - [RESTful Principles](#restful-principles)
       - [Standard Structure](#standard-structure)
       - [Avoiding Exposed Actions](#avoiding-exposed-actions)
+      - [Nesting for relationships](#nesting-for-relationships)
   - [Coding Standards](#coding-standards)
       - [Directory Structure](#directory-structure)
       - [Code Formatting](#code-formatting)
-      - [Dependency Management](#dependency-management)
   - [Commit and Merge Requests Guidelines](#commit-and-merge-requests-guidelines)
       - [Branching naming convention](#branching-naming-convention)
       - [Commit Messages](#commit-messages)
@@ -33,7 +33,6 @@ Repository that holds standardized information about contributing in the Zima pr
   - [Documentation Standards](#documentation-standards)
       - [Inline Comments](#inline-comments)
       - [API Documentation](#api-documentation)
-  - [Conclusion](#conclusion)
 
 ## Introduction
 
@@ -49,8 +48,8 @@ For our project, every bug, documentation update, or new feature should be split
 #### Naming Convention
 To maintain consistency and clarity in our issue tracker, we've established the following naming convention:
 
-Backend Issues: [BE] Feature/Bug/Docs: Detailed Issue Description
-Frontend Issues: [FE] Feature/Bug/Docs: Detailed Issue Description
+Backend Issues: [BE] Feature/Bug/Docs: Issue title
+Frontend Issues: [FE] Feature/Bug/Docs: Issue title
 For example:
 
 A backend feature might be named: [BE] Feature: Implement authentication middleware
@@ -58,7 +57,7 @@ A frontend bug might be named: [FE] Bug: Fix alignment in login form
 
 #### Issue types
 
-There are 4 issue types for zima project.
+There are 4 possible labels for issues.
 
 | Feature | Bug | Documentation | Won't fix |
 |---------|----------|---------|-----------|
@@ -118,56 +117,123 @@ A quick introduction to RESTful principles, emphasizing uniformity, statelessnes
 
 #### Avoiding Exposed Actions
 
-Explanation on why `/resource/action` is discouraged and the benefits of using a RESTful approach.
+In order to better comply to restful standards, we have to make use of __HTTP verbs__ instead of using verbs in the URL.
+
+Instead of using `/resource/update` or  `/resource/delete`, we have to let the __HTTP verbs__ describe the action we are applying to that resource. 
+
+So, a more restful approach would be creating two enpoints:
+
+- `PUT: /resource/{id}`
+- `DELETE: /resource/{id}`
+
+This way we only use nouns instead of verbs when exposing endpoints.
+
+#### Nesting for relationships
+
+Different endpoints can be interlinked, like getting a specific message from a specific user. This would require looking into the list of messages for a message sent by the specific user.
+
+Such an endpoint might look like this:
+
+`/messages/userId` 
+`/messages/{userId}`
+`/messages/user/{userId}` 
+
+They all comply with restfull standards and tell the user of the api that this enpoint looks into the messages resource by user id.
+
 
 ## Coding Standards
 
 #### Directory Structure
 
-Briefly discuss the recommended directory structure for Nest.js projects.
+When using nest.js, the code format is based on the modules. A module reflects a resource and actions that are taken on that resource, thus, a module can contain:
+- controller
+- service
+- repository layer
+- dtos
+- interface
+- specific middleware for this module
+
+A good directory structure is to include everything tied to the resource in a directory named by the resource, this means that for the __cat__ module we will have a directory named "cat" and the following files and directories
+
+- cat (directory)
+  - cat.service
+  - cat.module
+  - cat.controller
+  - dtos (directory)
+    - catCreateDto
+    - catDeleteDto
+    - etc
+  - interface (directory)
+    - cat.interface
+    - cat.schema
 
 #### Code Formatting
 
-Mention tools like Prettier or ESLint and any specific configurations or rules the team should follow.
-
-#### Dependency Management
-
-Guidelines on adding new dependencies, ensuring compatibility, and keeping the `package.json` and `package-lock.json` files clean.
+We use Pretier for formatting code.
 
 ## Commit and Merge Requests Guidelines
 
 #### Branching naming convention
-Branching naming convention
+Branching naming convention follow those of issue naming convention.
+The following naming strategy applies
+
+`<type>/<issue-title>` with "-" between issue title words.
+
+
+For an issue 
+`[BE] Feature: create oauth2 controller` we create a branch:
+`feature/create-oauth2-controller`
+
+Same goes for an issue:
+ `[BE] Bug: user controller not using http codes` we create a branch:
+`bug/user-controller-not-using-http-codes`
+
 
 #### Commit Messages
 
-Emphasize clear, concise commit messages. Maybe follow a pattern like: `<issue label>: <description>`.
+Commit messages should be atomic and granular. This means that when working on a issue there should be multiple commits that can each be reversed to a stable build.
+
+Commit messages should follow roughly the format by [convetional commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+This means that based on the issue label and issue title, a commit message will look like this:
+
+`<type>:<issue title> <description>`
+
+Type can be:
+- *fix* for *bug* issue label
+- *feat* for *feature* issue label
+- *docs* for *documentation issue label*
+
+The description should be short and concise and reflect what work has been done to the issue.
+
+Example
+
+`feat: create-user-repo: created repository and user dtos `
+`fix: fix-login-alignment: fixed login page alignment `
+
 
 #### Code Reviews
 
-The importance of peer reviews, what to look for, and how to provide constructive feedback.
+Before merging pull requests, a PR has to be approved by at least another member of the team, and not have any conflict.
+
+If quality gates are implemented, a PR should pass all quality gates and build without any errors before merging.
 
 ## Testing Standards
 
 #### Unit Testing
 
-Briefly describe the importance of unit tests, tools (e.g., Jest), and coverage targets.
+Write unit tests at least (update here)
 
 #### Integration Testing
 
-Discussion on how to write integration tests, especially for the endpoints.
+Idk if needed (update here)
 
 ## Documentation Standards
 
 #### Inline Comments
 
-Guidance on where and how to comment within code.
+Use inline comments whenever the codes gets too complex and too hard to understand.
 
 #### API Documentation
 
-Recommend tools like Swagger for API documentation and how to ensure it's consistently updated.
-
-## Conclusion
-
-Reiterate the importance of these standards and encourage team members to suggest improvements as the project evolves.
-
+Currently using Swagger for API documentation to better link the frontend and backend teams.
